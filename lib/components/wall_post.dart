@@ -7,6 +7,7 @@ class WallPost extends StatefulWidget {
   final String message;
   final String user;
   final String postId;
+
   const WallPost({
     super.key,
     required this.message,
@@ -19,13 +20,7 @@ class WallPost extends StatefulWidget {
 }
 
 class _WallPostState extends State<WallPost> {
-  // Current user
   final currentUser = FirebaseAuth.instance.currentUser!;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   // Delete a post
   void deletePost() {
@@ -34,7 +29,7 @@ class _WallPostState extends State<WallPost> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Delete Post"),
-        content: const Text("Are you sure?"),
+        content: const Text("Are you sure you want to delete this post?"),
         actions: [
           // Cancel button
           TextButton(
@@ -44,6 +39,7 @@ class _WallPostState extends State<WallPost> {
           // Delete button
           TextButton(
             onPressed: () async {
+              // Deleting the post from Firestore
               FirebaseFirestore.instance
                   .collection("User Post")
                   .doc(widget.postId)
@@ -51,8 +47,7 @@ class _WallPostState extends State<WallPost> {
                   .then((value) => print("Post deleted"))
                   .catchError(
                       (error) => print("Failed to delete post: $error"));
-              // Dismiss the dialog
-              Navigator.pop(context);
+              Navigator.pop(context); // Close the confirmation dialog
             },
             child: const Text("Delete"),
           ),
@@ -67,12 +62,19 @@ class _WallPostState extends State<WallPost> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 5,
+          ),
+        ],
       ),
       margin: const EdgeInsets.only(top: 25, left: 25, right: 25),
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // Profile pic
+          // Profile pic (Placeholder icon)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -85,25 +87,35 @@ class _WallPostState extends State<WallPost> {
             ),
           ),
           const SizedBox(width: 20),
-          // Expanded widget to handle overflow and wrap text
+          // Post content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Display user email (username)
                 Text(
                   widget.user,
-                  style: TextStyle(color: Colors.grey[500]),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
+                // Post message
                 Text(
                   widget.message,
-                  softWrap: true, // Allow text to wrap
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                  softWrap: true, // Allow text to wrap within the container
                 ),
               ],
             ),
           ),
-          // Delete button
-          if (widget.user == currentUser.email) DeleteButton(onTap: deletePost)
+          // Show delete button only if the current user is the post owner
+          if (widget.user == currentUser.email) DeleteButton(onTap: deletePost),
         ],
       ),
     );

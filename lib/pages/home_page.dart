@@ -3,6 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/text_field.dart';
 import 'package:flutter_application_1/components/wall_post.dart';
+import 'package:flutter_application_1/pages/page1.dart';
+import 'package:flutter_application_1/pages/page2.dart';
+import 'package:flutter_application_1/pages/page3.dart';
+import 'package:flutter_application_1/pages/page4.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,69 +16,161 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //user
   final currentUser = FirebaseAuth.instance.currentUser!;
-  //text controller
   final textController = TextEditingController();
 
-  //sign user out
+  // Sign out user
   void signOut() {
     FirebaseAuth.instance.signOut();
   }
 
-  //post message
-  void postMessage() {
-    //only post if there is something in the textfield
+  // Post message to Firestore based on collection name
+  void postMessage(String collectionName) {
     if (textController.text.isNotEmpty) {
-      //store in firebase
-      FirebaseFirestore.instance.collection("User Post").add({
+      FirebaseFirestore.instance.collection(collectionName).add({
         'UserEmail': currentUser.email,
         'Message': textController.text,
         'TimeStamp': Timestamp.now(),
       });
     }
 
-    // clear the textfield
     setState(() {
       textController.clear();
     });
   }
 
-//Access the document in Firebase
+  // Show collection selection as a bottom sheet
+  void showCollectionSelectionSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200, // Height of the bottom sheet
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              const Text(
+                "Select Member",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildCollectionOption("may"),
+                    _buildCollectionOption("anri"),
+                    _buildCollectionOption("sofiia"),
+                    _buildCollectionOption("khrystyna"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Build each collection option button
+  Widget _buildCollectionOption(String collectionName) {
+    // Check if the user can assign tasks to others or only to themselves
+    if (currentUser.email == "may@gmail.com" ||
+        currentUser.email == "$collectionName@gmail.com") {
+      return ListTile(
+        title: Text(collectionName),
+        onTap: () {
+          postMessage(collectionName); // Assign task to the selected member
+          Navigator.pop(context); // Close the bottom sheet after selection
+        },
+      );
+    } else {
+      // If the user is not allowed to assign tasks to this member, make the option disabled
+      return ListTile(
+        title: Text(collectionName),
+        enabled: false, // Disable the task assignment for others
+        subtitle: const Text("You can only assign tasks to yourself"),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        title: Text("TASK"),
+        title: const Text("TASK"),
         backgroundColor: Colors.white,
         actions: [
-          //sign out button
+          // Home Button
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+            icon: const Icon(Icons.home),
+          ),
+          // Page 1 Button
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Pageone()),
+              );
+            },
+            icon: const Icon(Icons.boy, color: Colors.lightBlue),
+          ),
+          // Page 2 Button
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Pagetwo()),
+              );
+            },
+            icon: const Icon(Icons.girl, color: Colors.lightGreen),
+          ),
+          // Page 3 Button
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Pagethree()),
+              );
+            },
+            icon: const Icon(Icons.girl, color: Colors.pink),
+          ),
+          // Page 4 Button
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Pagefour()),
+              );
+            },
+            icon: const Icon(Icons.boy, color: Colors.yellow),
+          ),
+          // Sign Out Button at the end
           IconButton(
             onPressed: signOut,
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
       body: Center(
         child: Column(
           children: [
-            //the wall
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
-                    .collection("User Post")
-                    .orderBy(
-                      "TimeStamp",
-                      descending: false,
-                    )
+                    .collection("User Post") // Initially fetch from "User Post"
+                    .orderBy("TimeStamp", descending: false)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
-                        //get the message
                         final post = snapshot.data!.docs[index];
                         return WallPost(
                           message: post['Message'],
@@ -85,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Error:${snapshot.error}'),
+                      child: Text('Error: ${snapshot.error}'),
                     );
                   }
                   return const Center(
@@ -94,34 +190,30 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
-            //post message
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: Row(
                 children: [
-                  //textview
                   Expanded(
-                      child: MyTextField(
-                          controller: textController,
-                          hintText: 'Write something on the wall',
-                          obscureText: false)),
-                  //post button
+                    child: MyTextField(
+                      controller: textController,
+                      hintText: 'Assign the task',
+                      obscureText: false,
+                    ),
+                  ),
                   IconButton(
-                    onPressed: postMessage,
+                    onPressed:
+                        showCollectionSelectionSheet, // Show the bottom sheet
                     icon: const Icon(Icons.arrow_circle_up),
-                  )
+                  ),
                 ],
               ),
             ),
-            //logged in as
             Text(
               "Logged in as: ${currentUser.email!}",
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
-
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 50),
           ],
         ),
       ),
