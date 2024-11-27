@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/text_field.dart';
 import 'package:flutter_application_1/components/wall_post.dart';
+import 'package:flutter_application_1/pages/deletedtask.dart'; // Import the DeletedPostsPage
 import 'package:flutter_application_1/pages/page1.dart';
 import 'package:flutter_application_1/pages/page2.dart';
 import 'package:flutter_application_1/pages/page3.dart';
@@ -149,6 +150,18 @@ class _HomePageState extends State<HomePage> {
               );
             },
             icon: const Icon(Icons.boy, color: Colors.yellow),
+          ),
+          // Deleted Posts Icon - Navigate to DeletedPostsPage
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        DeletedPostsPage()), // Navigate to DeletedPostsPage
+              );
+            },
+            icon: const Icon(Icons.delete_forever, color: Colors.red),
           ),
           // Sign Out Button at the end
           IconButton(

@@ -22,39 +22,32 @@ class WallPost extends StatefulWidget {
 class _WallPostState extends State<WallPost> {
   final currentUser = FirebaseAuth.instance.currentUser!;
 
-  // Delete a post
-  void deletePost() {
+  // Transfer post to another collection
+  void transferPost() async {
     final collectionName = currentUser?.email?.split('@')[0] ?? '';
-    // Show a dialog box asking for confirmation
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Post"),
-        content: const Text("Are you sure you want to delete this post?"),
-        actions: [
-          // Cancel button
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          // Delete button
-          TextButton(
-            onPressed: () async {
-              // Deleting the post from Firestore
-              FirebaseFirestore.instance
-                  .collection(collectionName)
-                  .doc(widget.postId)
-                  .delete()
-                  .then((value) => print("Post deleted"))
-                  .catchError(
-                      (error) => print("Failed to delete post: $error"));
-              Navigator.pop(context); // Close the confirmation dialog
-            },
-            child: const Text("Delete"),
-          ),
-        ],
-      ),
-    );
+    final postRef = FirebaseFirestore.instance
+        .collection(collectionName)
+        .doc(widget.postId);
+    final postSnapshot = await postRef.get();
+
+    if (postSnapshot.exists) {
+      // Move the post to the "deleted_posts" collection
+      final postData = postSnapshot.data();
+      if (postData != null) {
+        FirebaseFirestore.instance
+            .collection(
+                'deleted_posts') // Save it to the deleted_posts collection
+            .doc(widget.postId)
+            .set(postData)
+            .then((value) => print("Post transferred"))
+            .catchError((error) => print("Failed to transfer post: $error"));
+
+        // Optionally, remove from the original collection
+        postRef
+            .delete()
+            .then((_) => print("Post removed from original collection"));
+      }
+    }
   }
 
   @override
@@ -118,7 +111,7 @@ class _WallPostState extends State<WallPost> {
           // Show delete button only if the current user is the post owner
           if (widget.user == currentUser.email ||
               widget.user == "may@gmail.com")
-            DeleteButton(onTap: deletePost),
+            DeleteButton(onTap: transferPost), // Just transfer, no navigation
         ],
       ),
     );
