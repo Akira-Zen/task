@@ -24,6 +24,7 @@ class _WallPostState extends State<WallPost> {
 
   // Delete a post
   void deletePost() {
+    final collectionName = currentUser?.email?.split('@')[0] ?? '';
     // Show a dialog box asking for confirmation
     showDialog(
       context: context,
@@ -41,7 +42,7 @@ class _WallPostState extends State<WallPost> {
             onPressed: () async {
               // Deleting the post from Firestore
               FirebaseFirestore.instance
-                  .collection("User Post")
+                  .collection(collectionName)
                   .doc(widget.postId)
                   .delete()
                   .then((value) => print("Post deleted"))
@@ -115,7 +116,9 @@ class _WallPostState extends State<WallPost> {
             ),
           ),
           // Show delete button only if the current user is the post owner
-          if (widget.user == currentUser.email) DeleteButton(onTap: deletePost),
+          if (widget.user == currentUser.email ||
+              widget.user == "may@gmail.com")
+            DeleteButton(onTap: deletePost),
         ],
       ),
     );
