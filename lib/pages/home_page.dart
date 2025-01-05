@@ -57,10 +57,17 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: ListView(
                   children: [
+<<<<<<< HEAD
                     _buildCollectionOption("user_1"),
                     _buildCollectionOption("user_2"),
                     _buildCollectionOption("user_3"),
                     _buildCollectionOption("user_4"),
+=======
+                    _buildCollectionOption("may"),
+                    _buildCollectionOption("anri"),
+                    _buildCollectionOption("sofiia"),
+                    _buildCollectionOption("khrystyna"),
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
                   ],
                 ),
               ),
@@ -74,7 +81,11 @@ class _HomePageState extends State<HomePage> {
   // Build each collection option button
   Widget _buildCollectionOption(String collectionName) {
     // Check if the user can assign tasks to others or only to themselves
+<<<<<<< HEAD
     if (currentUser.email == "user_1@gmail.com" ||
+=======
+    if (currentUser.email == "may@gmail.com" ||
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
         currentUser.email == "$collectionName@gmail.com") {
       return ListTile(
         title: Text(collectionName),

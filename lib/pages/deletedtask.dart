@@ -6,7 +6,11 @@ class DeletedPostsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+<<<<<<< HEAD
         title: Text('Finshed tasks'),
+=======
+        title: Text('Deleted Posts'),
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:

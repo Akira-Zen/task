@@ -110,7 +110,11 @@ class _WallPostState extends State<WallPost> {
           ),
           // Show delete button only if the current user is the post owner
           if (widget.user == currentUser.email ||
+<<<<<<< HEAD
               widget.user == "user_1@gmail.com")
+=======
+              widget.user == "may@gmail.com")
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
             DeleteButton(onTap: transferPost), // Just transfer, no navigation
         ],
       ),

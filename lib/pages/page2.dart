@@ -6,14 +6,22 @@ class Pagetwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
       appBar: AppBar(title: Text('User 2')),
+=======
+      appBar: AppBar(title: Text('Sofiia')),
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
       body: Center(
         child: Column(
           children: [
             Expanded(
               child: StreamBuilder(
                 stream:
+<<<<<<< HEAD
                     FirebaseFirestore.instance.collection("user_2").snapshots(),
+=======
+                    FirebaseFirestore.instance.collection("sofiia").snapshots(),
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(

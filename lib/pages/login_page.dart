@@ -35,7 +35,10 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pop(context);
       //display error message
       displayMessage(e.code);
+<<<<<<< HEAD
       print(e.code);
+=======
+>>>>>>> 987802d80fa1e661b8adb31d16c3baeb632517a3
     }
   }
 
